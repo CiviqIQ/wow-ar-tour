@@ -23,8 +23,8 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
               <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
               <p class="p small">{s.address}</p>
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                <a class="btn btn--primary" href={`/tour/stop/${s.id}/`}>View stop</a>
-                {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer">Map It</a> : null}
+                <a class="btn btn--primary" href={`/tour/stop/${s.id}/`} data-evt="view_stop" data-stop={s.id}>View stop</a>
+                {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={s.id}>Map It</a> : null}
               </div>
             </div>
           </article>
@@ -34,4 +34,27 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
       <p class="small" style="margin-top:18px">Note: This wrapper page helps standardize stops, analytics, and future AI interactions. The AR runtime is currently powered by 8th Wall.</p>
     </div>
   </section>
+
+<script>
+  (() => {
+    const emit = (eventName, extra = {}) => {
+      const payload = { event: eventName, ...extra };
+      if (window.dataLayer && Array.isArray(window.dataLayer)) {
+        window.dataLayer.push(payload);
+      }
+      if (!window.dataLayer) {
+        console.log('[WOW analytics]', payload);
+      }
+    };
+
+    emit('tour_view');
+
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-evt]');
+      if (!el) return;
+      emit(el.getAttribute('data-evt'), { stop_id: el.getAttribute('data-stop') || '' });
+    });
+  })();
+</script>
+
 </BaseLayout>

@@ -8,7 +8,10 @@ export function getStaticPaths() {
 }
 
 const { stop: stopId } = Astro.params;
-const stop = data.stops.find((s) => s.id === stopId);
+const stopIndex = data.stops.findIndex((s) => s.id === stopId);
+const stop = stopIndex >= 0 ? data.stops[stopIndex] : undefined;
+const prev = stopIndex > 0 ? data.stops[stopIndex - 1] : null;
+const next = stopIndex >= 0 && stopIndex < data.stops.length - 1 ? data.stops[stopIndex + 1] : null;
 
 const title = stop ? `${stop.name} | ${data.tourName}` : `Stop not found | ${data.tourName}`;
 const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not found.';
@@ -19,7 +22,7 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
 
   <section class="section">
     <div class="container">
-      <p><a href="/tour/" class="small">← Back to all stops</a></p>
+      <p><a href="/tour/" class="small" data-evt="nav_all" data-stop={stopId}>← Back to all stops</a></p>
 
       {stop ? (
         <>
@@ -33,14 +36,20 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
               <p class="p">This opens the current 8th Wall experience in a new tab.</p>
 
               {stop.arUrl ? (
-                <a class="btn btn--primary" href={stop.arUrl} target="_blank" rel="noreferrer">Launch AR</a>
+                <a class="btn btn--primary" href={stop.arUrl} target="_blank" rel="noreferrer" data-evt="launch_ar" data-stop={stop.id}>Launch AR</a>
               ) : (
                 <p class="p"><strong>AR link missing.</strong> Add the 8th.io/8thwall link for this stop in <code>src/data/stops.json</code>.</p>
               )}
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                {stop.mapUrl ? <a class="btn" href={stop.mapUrl} target="_blank" rel="noreferrer">Map It</a> : null}
-                <a class="btn" href="https://whatoncewas.org/ar-tour-our-stories-our-streets/" target="_blank" rel="noreferrer">Original tour page</a>
+                {stop.mapUrl ? <a class="btn" href={stop.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={stop.id}>Map It</a> : null}
+                <a class="btn" href="https://whatoncewas.org/ar-tour-our-stories-our-streets/" target="_blank" rel="noreferrer" data-evt="orig_page" data-stop={stop.id}>Original tour page</a>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+                {prev ? <a class="btn" href={`/tour/stop/${prev.id}/`} data-evt="nav_prev" data-stop={stop.id}>← Prev</a> : null}
+                {next ? <a class="btn" href={`/tour/stop/${next.id}/`} data-evt="nav_next" data-stop={stop.id}>Next →</a> : null}
+                <a class="btn" href="/tour/" data-evt="nav_all" data-stop={stop.id}>All stops</a>
               </div>
 
               <hr style="border:0;border-top:1px solid rgba(255,255,255,.12);margin:18px 0" />
@@ -57,4 +66,32 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
       )}
     </div>
   </section>
+
+<script>
+  (() => {
+    // Lightweight analytics hooks.
+    // If GA4/gtag is later installed, this will feed it via dataLayer.
+    const stopId = document.querySelector('[data-stop]')?.getAttribute('data-stop') || '';
+
+    const emit = (eventName, extra = {}) => {
+      const payload = { event: eventName, stop_id: stopId, ...extra };
+      if (window.dataLayer && Array.isArray(window.dataLayer)) {
+        window.dataLayer.push(payload);
+      }
+      // Keep a debug trail during MVP
+      if (!window.dataLayer) {
+        console.log('[WOW analytics]', payload);
+      }
+    };
+
+    emit('stop_view');
+
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('[data-evt]');
+      if (!a) return;
+      emit(a.getAttribute('data-evt'));
+    });
+  })();
+</script>
+
 </BaseLayout>
