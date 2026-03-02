@@ -28,7 +28,17 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
         <>
           <span class="badge">Stop</span>
           <h1 class="h1">{stop.name}</h1>
+          <p class="p">{stop.description}</p>
           <p class="p">{stop.address}</p>
+
+          {stop.image?.src ? (
+            <div class="card" style="margin-top:18px">
+              <img src={stop.image.src} alt={stop.name} style="width:100%;height:min(48vh,380px);object-fit:cover;display:block" loading="lazy" />
+              <div class="card__body">
+                <p class="small">Photo: <a href={stop.image.creditUrl} target="_blank" rel="noreferrer">{stop.image.creditName}</a></p>
+              </div>
+            </div>
+          ) : null}
 
           <div class="card" style="margin-top:18px">
             <div class="card__body">

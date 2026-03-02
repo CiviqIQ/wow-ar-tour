@@ -13,19 +13,38 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
   <section class="section">
     <div class="container">
       <span class="badge">{data.character.name} • AR Tour</span>
-      <h1 class="h1">{data.tourName}</h1>
-      <p class="p">Choose a stop below. When you tap <strong>Launch AR</strong>, the 8th Wall experience will open in a new tab.</p>
+      <h1 class="h1">{data.overview.headline}</h1>
+      <p class="p">{data.overview.subhead}</p>
+      <p class="p">{data.overview.body}</p>
+
+      <div class="grid grid-2" style="margin-top:18px">
+        <div class="card"><div class="card__body">
+          <h2 class="h2">How it works</h2>
+          <ol class="p">
+            {data.overview.howItWorks.map((x) => (<li>{x}</li>))}
+          </ol>
+        </div></div>
+        <div class="card"><div class="card__body">
+          <h2 class="h2">What to expect</h2>
+          <ul class="p">
+            {data.overview.whatToExpect.map((x) => (<li>{x}</li>))}
+          </ul>
+        </div></div>
+      </div>
 
       <div class="grid grid-2" style="margin-top:18px">
         {data.stops.map((s) => (
           <article class="card">
+            {s.image?.src ? <img src={s.image.src} alt={s.name} style="width:100%;height:190px;object-fit:cover;display:block" loading="lazy" /> : null}
             <div class="card__body">
               <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
+              <p class="p small">{s.description}</p>
               <p class="p small">{s.address}</p>
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
                 <a class="btn btn--primary" href={`/tour/stop/${s.id}/`} data-evt="view_stop" data-stop={s.id}>View stop</a>
                 {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={s.id}>Map It</a> : null}
               </div>
+              {s.image?.creditUrl ? <p class="small" style="margin-top:10px">Photo: <a href={s.image.creditUrl} target="_blank" rel="noreferrer">{s.image.creditName}</a></p> : null}
             </div>
           </article>
         ))}

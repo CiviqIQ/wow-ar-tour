@@ -5,48 +5,99 @@
     "id": "jacob-fontaine",
     "name": "Jacob Fontaine"
   },
+  "overview": {
+    "headline": "Our Stories, Our Streets",
+    "subhead": "An AR walking tour guided by Jacob Fontaine",
+    "body": "Step into Austin’s Black history through an immersive AR walking tour. At each stop, you’ll unlock a short story that connects place, people, and legacy—bringing the past into view on the streets where it happened.",
+    "howItWorks": [
+      "Choose a stop (or follow the route in order).",
+      "Tap Launch AR to open the story experience.",
+      "Return here to continue to the next stop."
+    ],
+    "whatToExpect": [
+      "6 stops across East Austin.",
+      "Short, mobile-first stories.",
+      "Great for self-guided exploration, classes, and community events."
+    ]
+  },
   "stops": [
     {
       "id": "gold-dollar-building",
       "name": "Gold Dollar Building",
       "address": "Austin, TX",
       "mapUrl": "https://maps.app.goo.gl/sn4JJ5RykXTSWtRU7",
-      "arUrl": "https://froliq.8thwall.app/jacob-fontaine-gold-dollar-building/"
+      "arUrl": "https://froliq.8thwall.app/jacob-fontaine-gold-dollar-building/",
+      "description": "A landmark of East Austin’s business and cultural life—where community gathered, built, and sustained itself across generations.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1529421308418-eab98863cee1?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     },
     {
       "id": "blackland",
       "name": "Blackland",
       "address": "Austin, TX",
       "mapUrl": "https://maps.app.goo.gl/2tHcj2NDhktqqsTB6",
-      "arUrl": "https://froliq.8thwall.app/jacob-fontaine/" 
+      "arUrl": "https://froliq.8thwall.app/jacob-fontaine/",
+      "description": "A neighborhood story of home, change, and community identity—told through the places that shaped daily life.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1520012218364-3dbe62c99f42?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     },
     {
       "id": "rogers-washington-holy-cross",
       "name": "Rogers Washington Holy Cross",
       "address": "E. Martin Luther King Jr. Blvd., Austin, TX 78722",
       "mapUrl": "https://maps.app.goo.gl/5DM68NyEZzktgCWM6",
-      "arUrl": "http://8th.io/p2usd"
+      "arUrl": "http://8th.io/p2usd",
+      "description": "A living anchor of faith and community leadership—reflecting how institutions helped hold neighborhoods together.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1521829491461-4cc0e414b5c9?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     },
     {
       "id": "rosewood-courts",
       "name": "Rosewood Courts",
       "address": "Austin, TX",
       "mapUrl": "https://maps.app.goo.gl/ABrUxLk84MUjinsD7",
-      "arUrl": "http://8th.io/x4a4j"
+      "arUrl": "http://8th.io/x4a4j",
+      "description": "A window into everyday life, resilience, and the systems that shaped housing and opportunity in East Austin.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     },
     {
       "id": "huston-tillotson-university",
       "name": "Huston Tillotson University",
       "address": "Austin, TX",
       "mapUrl": "https://maps.app.goo.gl/DSWHsPeGoCdGgSDE7",
-      "arUrl": "http://8th.io/b6z96"
+      "arUrl": "http://8th.io/b6z96",
+      "description": "A cornerstone of education and leadership—showing how learning institutions powered progress and possibility.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     },
     {
       "id": "victory-grill",
       "name": "Victory Grill",
       "address": "Austin, TX",
       "mapUrl": "https://maps.app.goo.gl/uWWSeAy1gBNG2g8M6",
-      "arUrl": "http://8th.io/3ef8r" 
+      "arUrl": "http://8th.io/3ef8r",
+      "description": "A legendary venue where music, culture, and history converged—capturing the sound and spirit of an era.",
+      "image": {
+        "src": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1400&q=70",
+        "creditName": "Unsplash",
+        "creditUrl": "https://unsplash.com"
+      }
     }
   ]
 }
