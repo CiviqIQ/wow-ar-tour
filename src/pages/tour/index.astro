@@ -39,10 +39,11 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
   (() => {
     const emit = (eventName, extra = {}) => {
       const payload = { event: eventName, ...extra };
-      if (window.dataLayer && Array.isArray(window.dataLayer)) {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, payload);
+      } else if (window.dataLayer && Array.isArray(window.dataLayer)) {
         window.dataLayer.push(payload);
-      }
-      if (!window.dataLayer) {
+      } else {
         console.log('[WOW analytics]', payload);
       }
     };

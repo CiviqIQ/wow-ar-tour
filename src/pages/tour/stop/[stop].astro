@@ -75,11 +75,11 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
 
     const emit = (eventName, extra = {}) => {
       const payload = { event: eventName, stop_id: stopId, ...extra };
-      if (window.dataLayer && Array.isArray(window.dataLayer)) {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, payload);
+      } else if (window.dataLayer && Array.isArray(window.dataLayer)) {
         window.dataLayer.push(payload);
-      }
-      // Keep a debug trail during MVP
-      if (!window.dataLayer) {
+      } else {
         console.log('[WOW analytics]', payload);
       }
     };

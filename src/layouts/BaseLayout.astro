@@ -12,6 +12,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).to
     {description ? <meta name="description" content={description} /> : null}
     <link rel="canonical" href={canonical} />
     <link rel="stylesheet" href="/styles/global.css" />
+
+    <!-- GA4 (What Once Was) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GPKHN659C9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GPKHN659C9', { send_page_view: true });
+    </script>
   </head>
   <body>
     <main>
