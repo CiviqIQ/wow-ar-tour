@@ -33,7 +33,7 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
           <div class="card" style="margin-top:18px">
             <div class="card__body">
               <h2 class="h2">Launch AR experience</h2>
-              <p class="p">This opens the current 8th Wall experience in a new tab.</p>
+              <p class="p">This opens the current 8th Wall experience in a new tab. After you finish, return here for the next stop.</p>
 
               {stop.arUrl ? (
                 <a class="btn btn--primary" href={stop.arUrl} target="_blank" rel="noreferrer" data-evt="launch_ar" data-stop={stop.id}>Launch AR</a>
@@ -50,6 +50,12 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
                 {prev ? <a class="btn" href={`/tour/stop/${prev.id}/`} data-evt="nav_prev" data-stop={stop.id}>← Prev</a> : null}
                 {next ? <a class="btn" href={`/tour/stop/${next.id}/`} data-evt="nav_next" data-stop={stop.id}>Next →</a> : null}
                 <a class="btn" href="/tour/" data-evt="nav_all" data-stop={stop.id}>All stops</a>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+                <button class="btn" type="button" data-copylink data-evt="copy_link" data-stop={stop.id}>Copy link</button>
+                <a class="btn" href={`/tour/stop/${stop.id}/`} target="_blank" rel="noreferrer" data-evt="share_open" data-stop={stop.id}>Open in new tab</a>
+                <button class="btn" type="button" data-reportissue data-evt="report_issue" data-stop={stop.id}>Report issue</button>
               </div>
 
               <hr style="border:0;border-top:1px solid rgba(255,255,255,.12);margin:18px 0" />
@@ -86,9 +92,36 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
 
     emit('stop_view');
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', async (e) => {
       const a = e.target.closest('[data-evt]');
       if (!a) return;
+
+      // copy link helper
+      const copyBtn = e.target.closest('[data-copylink]');
+      if (copyBtn) {
+        try {
+          await navigator.clipboard.writeText(location.href);
+          emit('copy_link_success');
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => (copyBtn.textContent = 'Copy link'), 1200);
+        } catch {
+          emit('copy_link_failed');
+          window.prompt('Copy this link:', location.href);
+        }
+        return;
+      }
+
+      // report issue helper
+      const reportBtn = e.target.closest('[data-reportissue]');
+      if (reportBtn) {
+        const stop = reportBtn.getAttribute('data-stop') || '';
+        const subject = encodeURIComponent(`WOW AR Tour issue: ${stop}`);
+        const body = encodeURIComponent(`Stop: ${stop}\nURL: ${location.href}\n\nDescribe the issue:`);
+        location.href = `mailto:carl@civiciq.consulting?subject=${subject}&body=${body}`;
+        emit('report_issue_opened');
+        return;
+      }
+
       emit(a.getAttribute('data-evt'));
     });
   })();
