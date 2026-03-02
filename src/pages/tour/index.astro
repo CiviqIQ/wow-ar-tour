@@ -23,7 +23,7 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
               <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
               <p class="p small">{s.address}</p>
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                <a class="btn btn--primary" href={`/tour/stop/?stop=${s.id}`}>View stop</a>
+                <a class="btn btn--primary" href={`/tour/stop/${s.id}/`}>View stop</a>
                 {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer">Map It</a> : null}
               </div>
             </div>

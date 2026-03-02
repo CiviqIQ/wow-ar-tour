@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import data from '../../../data/stops.json';
+
+export function getStaticPaths() {
+  return data.stops.map((s) => ({ params: { stop: s.id } }));
+}
+
+const { stop: stopId } = Astro.params;
+const stop = data.stops.find((s) => s.id === stopId);
+
+const title = stop ? `${stop.name} | ${data.tourName}` : `Stop not found | ${data.tourName}`;
+const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not found.';
+---
+
+<BaseLayout title={title} description={description}>
+  <SiteHeader />
+
+  <section class="section">
+    <div class="container">
+      <p><a href="/tour/" class="small">← Back to all stops</a></p>
+
+      {stop ? (
+        <>
+          <span class="badge">Stop</span>
+          <h1 class="h1">{stop.name}</h1>
+          <p class="p">{stop.address}</p>
+
+          <div class="card" style="margin-top:18px">
+            <div class="card__body">
+              <h2 class="h2">Launch AR experience</h2>
+              <p class="p">This opens the current 8th Wall experience in a new tab.</p>
+
+              {stop.arUrl ? (
+                <a class="btn btn--primary" href={stop.arUrl} target="_blank" rel="noreferrer">Launch AR</a>
+              ) : (
+                <p class="p"><strong>AR link missing.</strong> Add the 8th.io/8thwall link for this stop in <code>src/data/stops.json</code>.</p>
+              )}
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                {stop.mapUrl ? <a class="btn" href={stop.mapUrl} target="_blank" rel="noreferrer">Map It</a> : null}
+                <a class="btn" href="https://whatoncewas.org/ar-tour-our-stories-our-streets/" target="_blank" rel="noreferrer">Original tour page</a>
+              </div>
+
+              <hr style="border:0;border-top:1px solid rgba(255,255,255,.12);margin:18px 0" />
+              <p class="small">Having trouble? Use a modern mobile browser (Safari/Chrome) and enable camera permissions.</p>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 class="h1">Stop not found</h1>
+          <p class="p">We couldn’t find a stop with id: <code>{stopId}</code></p>
+          <p class="p"><a href="/tour/">Return to all stops</a></p>
+        </>
+      )}
+    </div>
+  </section>
+</BaseLayout>
