@@ -42,9 +42,9 @@
       "arUrl": "https://froliq.8thwall.app/jacob-fontaine/",
       "description": "A neighborhood story of home, change, and community identity—told through the places that shaped daily life.",
       "image": {
-        "src": "https://images.unsplash.com/photo-1520012218364-3dbe62c99f42?auto=format&fit=crop&w=1400&q=70",
-        "creditName": "Unsplash",
-        "creditUrl": "https://unsplash.com"
+        "src": "/media/stops/blackland/main.jpg",
+        "creditName": "Unsplash (placeholder)",
+        "creditUrl": "https://images.unsplash.com/photo-1520012218364-3dbe62c99f42"
       }
     },
     {
