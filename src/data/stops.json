@@ -1,0 +1,52 @@
+{
+  "tourId": "our-stories-our-streets",
+  "tourName": "Our Stories, Our Streets",
+  "character": {
+    "id": "jacob-fontaine",
+    "name": "Jacob Fontaine"
+  },
+  "stops": [
+    {
+      "id": "gold-dollar-building",
+      "name": "Gold Dollar Building",
+      "address": "Austin, TX",
+      "mapUrl": "https://maps.app.goo.gl/sn4JJ5RykXTSWtRU7",
+      "arUrl": "https://froliq.8thwall.app/jacob-fontaine-gold-dollar-building/"
+    },
+    {
+      "id": "blackland",
+      "name": "Blackland",
+      "address": "Austin, TX",
+      "mapUrl": "https://maps.app.goo.gl/2tHcj2NDhktqqsTB6",
+      "arUrl": "" 
+    },
+    {
+      "id": "rogers-washington-holy-cross",
+      "name": "Rogers Washington Holy Cross",
+      "address": "E. Martin Luther King Jr. Blvd., Austin, TX 78722",
+      "mapUrl": "https://maps.app.goo.gl/5DM68NyEZzktgCWM6",
+      "arUrl": "http://8th.io/p2usd"
+    },
+    {
+      "id": "rosewood-courts",
+      "name": "Rosewood Courts",
+      "address": "Austin, TX",
+      "mapUrl": "https://maps.app.goo.gl/ABrUxLk84MUjinsD7",
+      "arUrl": "http://8th.io/x4a4j"
+    },
+    {
+      "id": "huston-tillotson-university",
+      "name": "Huston Tillotson University",
+      "address": "Austin, TX",
+      "mapUrl": "https://maps.app.goo.gl/DSWHsPeGoCdGgSDE7",
+      "arUrl": "http://8th.io/b6z96"
+    },
+    {
+      "id": "victory-grill",
+      "name": "Victory Grill",
+      "address": "Austin, TX",
+      "mapUrl": "https://maps.app.goo.gl/uWWSeAy1gBNG2g8M6",
+      "arUrl": "" 
+    }
+  ]
+}

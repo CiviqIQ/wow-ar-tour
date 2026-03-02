@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import data from '../../data/stops.json';
+
+const title = `Jacob Fontaine AR Tour | ${data.tourName}`;
+const description = 'Scan a QR code, choose a stop, then launch the AR story experience (8th Wall) in a new tab.';
+---
+
+<BaseLayout title={title} description={description}>
+  <SiteHeader />
+
+  <section class="section">
+    <div class="container">
+      <span class="badge">{data.character.name} • AR Tour</span>
+      <h1 class="h1">{data.tourName}</h1>
+      <p class="p">Choose a stop below. When you tap <strong>Launch AR</strong>, the 8th Wall experience will open in a new tab.</p>
+
+      <div class="grid grid-2" style="margin-top:18px">
+        {data.stops.map((s) => (
+          <article class="card">
+            <div class="card__body">
+              <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
+              <p class="p small">{s.address}</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                <a class="btn btn--primary" href={`/tour/stop/?stop=${s.id}`}>View stop</a>
+                {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer">Map It</a> : null}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <p class="small" style="margin-top:18px">Note: This wrapper page helps standardize stops, analytics, and future AI interactions. The AR runtime is currently powered by 8th Wall.</p>
+    </div>
+  </section>
+</BaseLayout>

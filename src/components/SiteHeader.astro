@@ -1,0 +1,17 @@
+---
+const title = Astro.props.title ?? 'WOW AR Tour';
+---
+<header class="header">
+  <div class="container header__row">
+    <a class="brand" href="/tour/">What Once Was — AR Tour</a>
+    <div class="header__right">
+      <span class="kicker">Wrapper (v1)</span>
+    </div>
+  </div>
+</header>
+<style>
+  .header{position:sticky;top:0;z-index:50;background:rgba(7,8,10,.72);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.10)}
+  .header__row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+  .brand{font-weight:800;letter-spacing:.02em;color:#fff;text-decoration:none}
+  .kicker{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+</style>
