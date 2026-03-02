@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import data from '../../data/stops.json';
+
+const title = 'Photo credits | WOW AR Tour';
+---
+
+<BaseLayout title={title}>
+  <SiteHeader />
+  <section class="section">
+    <div class="container">
+      <h1 class="h1">Photo credits</h1>
+      <p class="p">Stop images are used under Creative Commons licenses and/or from What Once Was’ own collection.</p>
+
+      <div class="grid" style="margin-top:18px">
+        {data.stops.map((s) => (
+          <div class="card">
+            <div class="card__body">
+              <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
+              <p class="p"><strong>Credit:</strong> {s.image?.creditName || '—'}</p>
+              {s.image?.creditUrl ? <p class="p"><a href={s.image.creditUrl} target="_blank" rel="noreferrer">Source / license</a></p> : <p class="p">Source: (own collection)</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p class="small" style="margin-top:18px">If you believe any media is misattributed, please contact us so we can correct it.</p>
+    </div>
+  </section>
+</BaseLayout>
