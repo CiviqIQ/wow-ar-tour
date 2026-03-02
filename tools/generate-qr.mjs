@@ -7,13 +7,32 @@ const data = JSON.parse(await readFile(new URL('../src/data/stops.json', import.
 const BASE = 'https://tour.whatoncewas.org';
 const OUT_DIR = path.resolve('dist-qr');
 
+// Human-friendly order for print sheet
+const ORDER = [
+  'gold-dollar-building',
+  'blackland',
+  'rogers-washington-holy-cross',
+  'rosewood-courts',
+  'huston-tillotson-university',
+  'victory-grill'
+];
+
 const safe = (s) => s.toLowerCase().replace(/[^a-z0-9\-]+/g, '-').replace(/-+/g, '-').replace(/(^-|-$)/g, '');
 
 await fs.mkdir(OUT_DIR, { recursive: true });
 
 const rows = [];
 
-for (const stop of data.stops) {
+const stops = [...data.stops].sort((a,b) => {
+  const ai = ORDER.indexOf(a.id);
+  const bi = ORDER.indexOf(b.id);
+  if (ai === -1 && bi === -1) return a.id.localeCompare(b.id);
+  if (ai === -1) return 1;
+  if (bi === -1) return -1;
+  return ai - bi;
+});
+
+for (const stop of stops) {
   const url = `${BASE}/tour/stop/${stop.id}/`;
   const filename = `${stop.id}.png`;
   const filePath = path.join(OUT_DIR, filename);
@@ -52,12 +71,13 @@ await fs.writeFile(path.join(OUT_DIR, 'qr-map.csv'), csv);
 
 // Simple print sheet HTML
 const cards = rows.map(r => {
+  const href = r.qr_url;
   return `
   <div class="card">
     <img src="./${path.basename(r.qr_png)}" alt="QR: ${r.name}" />
     <div class="meta">
       <div class="name">${r.name}</div>
-      <div class="small">${r.qr_url}</div>
+      <div class="small"><a href="${href}">${href}</a></div>
     </div>
   </div>`;
 }).join('\n');
