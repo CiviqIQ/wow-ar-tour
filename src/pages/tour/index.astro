@@ -3,7 +3,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import data from '../../data/stops.json';
 
-const title = `Jacob Fontaine AR Tour | ${data.tourName}`;
+const guideId = Astro.url.searchParams.get('g') || data.defaultGuideId;
+const guide = data.guides.find((x) => x.id === guideId) || data.guides[0];
+
+const title = `${guide.name} | ${data.tourName}`;
 const description = 'Scan a QR code, choose a stop, then launch the AR story experience (8th Wall) in a new tab.';
 ---
 
@@ -12,9 +15,36 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
 
   <section class="section">
     <div class="container">
-      <span class="badge">{data.character.name} • AR Tour</span>
+      <span class="badge">{guide.name} • AR Tour</span>
       <h1 class="h1">{data.overview.headline}</h1>
       <p class="p">{data.overview.subhead}</p>
+
+      <div class="card" style="margin-top:18px">
+        <div class="card__body">
+          <h2 class="h2" style="margin-bottom:8px">Choose your guide</h2>
+          <p class="p small" style="margin-top:0">Prototype: Teyah is our AI-enabled tour guide. For now, guide selection changes the tour context while AR experiences open in 8th Wall.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+            {data.guides.map((g) => (
+              <a class={`btn ${g.id === guide.id ? 'btn--primary' : ''}`.trim()} href={`/tour/?g=${g.id}`} data-evt="guide_select" data-guide={g.id} style="display:flex;align-items:center;gap:10px">
+                {g.image?.src ? (
+                  <img
+                    src={g.image.src}
+                    alt={g.image.alt || g.name}
+                    width="44"
+                    height="44"
+                    loading="lazy"
+                    style="border-radius:999px;object-fit:cover;object-position:50% 10%;display:block;flex:0 0 44px"
+                  />
+                ) : (
+                  <span aria-hidden="true" style="width:44px;height:44px;border-radius:999px;background:rgba(255,255,255,.12);display:block;flex:0 0 44px"></span>
+                )}
+                <span>{g.name}</span>
+              </a>
+            ))}
+          </div>
+          <p class="small" style="margin-top:12px"><strong>{guide.name}:</strong> {guide.bio}</p>
+        </div>
+      </div>
       <p class="p">{data.overview.body}</p>
 
       <div class="grid grid-2" style="margin-top:18px">
@@ -41,7 +71,7 @@ const description = 'Scan a QR code, choose a stop, then launch the AR story exp
               <p class="p small">{s.description}</p>
               <p class="p small">{s.address}</p>
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                <a class="btn btn--primary" href={`/tour/stop/${s.id}/`} data-evt="view_stop" data-stop={s.id}>View stop</a>
+                <a class="btn btn--primary" href={`/tour/stop/${s.id}/?g=${guide.id}`} data-evt="view_stop" data-stop={s.id}>View stop</a>
                 {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={s.id}>Map It</a> : null}
               </div>
               {s.image?.creditUrl ? <p class="small" style="margin-top:10px">Photo: <a href={s.image.creditUrl} target="_blank" rel="noreferrer">{s.image.creditName}</a></p> : null}

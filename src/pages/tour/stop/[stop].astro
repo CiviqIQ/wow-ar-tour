@@ -8,12 +8,17 @@ export function getStaticPaths() {
 }
 
 const { stop: stopId } = Astro.params;
+
+const guideId = Astro.url.searchParams.get('g') || data.defaultGuideId;
+const guide = data.guides.find((x) => x.id === guideId) || data.guides[0];
+const guideParam = `?g=${guide.id}`;
+
 const stopIndex = data.stops.findIndex((s) => s.id === stopId);
 const stop = stopIndex >= 0 ? data.stops[stopIndex] : undefined;
 const prev = stopIndex > 0 ? data.stops[stopIndex - 1] : null;
 const next = stopIndex >= 0 && stopIndex < data.stops.length - 1 ? data.stops[stopIndex + 1] : null;
 
-const title = stop ? `${stop.name} | ${data.tourName}` : `Stop not found | ${data.tourName}`;
+const title = stop ? `${stop.name} | ${data.tourName} (${guide.name})` : `Stop not found | ${data.tourName}`;
 const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not found.';
 ---
 
@@ -22,11 +27,23 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
 
   <section class="section">
     <div class="container">
-      <p><a href="/tour/" class="small" data-evt="nav_all" data-stop={stopId}>← Back to all stops</a></p>
+      <p><a href={`/tour/${guideParam}`} class="small" data-evt="nav_all" data-stop={stopId}>← Back to all stops</a></p>
 
       {stop ? (
         <>
-          <span class="badge">Stop</span>
+          <span class="badge" style="display:inline-flex;align-items:center;gap:8px">
+            {guide.image?.src ? (
+              <img
+                src={guide.image.src}
+                alt={guide.image.alt || guide.name}
+                width="22"
+                height="22"
+                loading="lazy"
+                style="border-radius:999px;object-fit:cover;object-position:50% 10%;display:block"
+              />
+            ) : null}
+            <span>Stop • Guide: {guide.name}</span>
+          </span>
           <h1 class="h1">{stop.name}</h1>
           <p class="p">{stop.description}</p>
           <p class="p">{stop.address}</p>
@@ -57,14 +74,14 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
               </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
-                {prev ? <a class="btn" href={`/tour/stop/${prev.id}/`} data-evt="nav_prev" data-stop={stop.id}>← Prev</a> : null}
-                {next ? <a class="btn" href={`/tour/stop/${next.id}/`} data-evt="nav_next" data-stop={stop.id}>Next →</a> : null}
-                <a class="btn" href="/tour/" data-evt="nav_all" data-stop={stop.id}>All stops</a>
+                {prev ? <a class="btn" href={`/tour/stop/${prev.id}/${guideParam}`} data-evt="nav_prev" data-stop={stop.id}>← Prev</a> : null}
+                {next ? <a class="btn" href={`/tour/stop/${next.id}/${guideParam}`} data-evt="nav_next" data-stop={stop.id}>Next →</a> : null}
+                <a class="btn" href={`/tour/${guideParam}`} data-evt="nav_all" data-stop={stop.id}>All stops</a>
               </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
                 <button class="btn" type="button" data-copylink data-evt="copy_link" data-stop={stop.id}>Copy link</button>
-                <a class="btn" href={`/tour/stop/${stop.id}/`} target="_blank" rel="noreferrer" data-evt="share_open" data-stop={stop.id}>Open in new tab</a>
+                <a class="btn" href={`/tour/stop/${stop.id}/${guideParam}`} target="_blank" rel="noreferrer" data-evt="share_open" data-stop={stop.id}>Open in new tab</a>
                 <button class="btn" type="button" data-reportissue data-evt="report_issue" data-stop={stop.id}>Report issue</button>
               </div>
 
@@ -77,7 +94,7 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
         <>
           <h1 class="h1">Stop not found</h1>
           <p class="p">We couldn’t find a stop with id: <code>{stopId}</code></p>
-          <p class="p"><a href="/tour/">Return to all stops</a></p>
+          <p class="p"><a href={`/tour/${guideParam}`}>Return to all stops</a></p>
         </>
       )}
     </div>

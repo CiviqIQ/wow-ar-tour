@@ -1,13 +1,28 @@
 {
   "tourId": "our-stories-our-streets",
   "tourName": "Our Stories, Our Streets",
-  "character": {
-    "id": "jacob-fontaine",
-    "name": "Jacob Fontaine"
-  },
+  "defaultGuideId": "jacob-fontaine",
+  "guides": [
+    {
+      "id": "jacob-fontaine",
+      "name": "Jacob Fontaine",
+      "tagline": "Historic guide",
+      "bio": "A historic guide for the tour experience."
+    },
+    {
+      "id": "teyah",
+      "name": "Teyah",
+      "tagline": "AI-enabled tour guide (prototype)",
+      "bio": "Teyah is the prototype for our AI-enabled tour guide — an African American girl (ages 8–12) with a curious, brave, friendly kid-reporter vibe.",
+      "image": {
+        "src": "/media/guides/teyah.jpg",
+        "alt": "Teyah — AI-enabled tour guide prototype"
+      }
+    }
+  ],
   "overview": {
     "headline": "Our Stories, Our Streets",
-    "subhead": "An AR walking tour guided by Jacob Fontaine",
+    "subhead": "An AR walking tour guided by community stories",
     "body": "Step into Austin’s Black history through an immersive AR walking tour. At each stop, you’ll unlock a short story that connects place, people, and legacy—bringing the past into view on the streets where it happened.",
     "howItWorks": [
       "Choose a stop (or follow the route in order).",
