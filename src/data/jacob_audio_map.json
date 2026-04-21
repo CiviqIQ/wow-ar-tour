@@ -1,0 +1,33 @@
+{
+  "version": "2026-04-20",
+  "guideId": "jacob-fontaine",
+  "model": {
+    "src": "/media/jacob/models/jacob-fontaine.glb"
+  },
+  "stops": {
+    "gold-dollar-building": {
+      "title": "Gold Dollar Building",
+      "audioUrl": "/media/jacob/audio/gold-dollar-building_v1.mp3"
+    },
+    "blackland-neighborhood": {
+      "title": "Blackland Neighborhood",
+      "audioUrl": "/media/jacob/audio/blackland-neighborhood_v1.mp3"
+    },
+    "huston-tillotson-university": {
+      "title": "Huston–Tillotson University",
+      "audioUrl": "/media/jacob/audio/huston-tillotson_v1.mp3"
+    },
+    "rogers-washington-holy-cross-historic-district": {
+      "title": "Rogers–Washington–Holy Cross Historic District",
+      "audioUrl": "/media/jacob/audio/rogers-washington-holy-cross_v1.mp3"
+    },
+    "rosewood-courts-emancipation-park": {
+      "title": "Rosewood Courts & Emancipation Park",
+      "audioUrl": "/media/jacob/audio/rosewood-courts-emancipation-park_v1.mp3"
+    },
+    "victory-grill-east-11th-corridor": {
+      "title": "Victory Grill / East 11th Corridor",
+      "audioUrl": "/media/jacob/audio/victory-grill-east-11th_v1.mp3"
+    }
+  }
+}

@@ -1,0 +1,224 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import jacobMap from "../../data/jacob_audio_map.json";
+
+const stopId = Astro.url.searchParams.get("stop") || "";
+const stop = (jacobMap.stops && (jacobMap.stops as any)[stopId]) || null;
+
+const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
+  id,
+  title: s.title,
+}));
+---
+
+<BaseLayout title={`Talk to Jacob Fontaine${stop ? ` — ${stop.title}` : ""}`}
+  description="Interactive guide: Jacob Fontaine (prototype)."
+>
+  <main class="wrap">
+    <header class="head">
+      <h1>Talk to Jacob Fontaine</h1>
+      {stop ? (
+        <p class="sub">Current stop: <strong>{stop.title}</strong></p>
+      ) : (
+        <p class="sub">Choose a stop below, or open this page from a tour stop.</p>
+      )}
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="viewer">
+          <!-- Fast MVP: model-viewer for rendering. Mouth animation + visemes can come later. -->
+          <model-viewer
+            src={jacobMap.model.src}
+            camera-controls
+            autoplay
+            shadow-intensity="0.8"
+            exposure="1"
+            style="width:100%; height: 420px; background: #0b0b0c; border-radius: 12px;"
+            alt="Jacob Fontaine 3D model"
+          ></model-viewer>
+        </div>
+        <p class="note">Prototype: audio is prerecorded per stop. Mic input is used to pick an appropriate response.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="h2">Controls</h2>
+
+        <div class="controls">
+          <button id="btnPlay" class="btn" disabled={!stop}>Play stop narration</button>
+          <button id="btnStop" class="btn secondary" disabled>Stop</button>
+        </div>
+
+        <div class="controls">
+          <button id="btnMic" class="btn">Mic (ask about this stop)</button>
+          <span id="micStatus" class="status">Mic idle</span>
+        </div>
+
+        <div class="panel">
+          <div class="label">You said</div>
+          <div id="youSaid" class="box">—</div>
+        </div>
+
+        <div class="panel">
+          <div class="label">Jacob</div>
+          <div id="jacobSays" class="box">{stop ? "Press Play, or ask a question." : "Pick a stop to begin."}</div>
+        </div>
+
+        <h2 class="h2">Stops</h2>
+        <ul class="stops">
+          {suggestedStops.map((s) => (
+            <li>
+              <a class:list={["stopLink", s.id === stopId ? "active" : ""]} href={`/tour/jacob?stop=${encodeURIComponent(s.id)}`}>{s.title}</a>
+            </li>
+          ))}
+        </ul>
+
+        <audio id="player" preload="auto" src={stop ? stop.audioUrl : ""}></audio>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <script define:vars={{ stopId, stop, jacobMap }}>
+    const player = document.getElementById('player');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnStop = document.getElementById('btnStop');
+    const btnMic = document.getElementById('btnMic');
+    const micStatus = document.getElementById('micStatus');
+    const youSaid = document.getElementById('youSaid');
+    const jacobSays = document.getElementById('jacobSays');
+
+    function setStopEnabled(isEnabled) {
+      btnStop.disabled = !isEnabled;
+    }
+
+    function stopAudio() {
+      player.pause();
+      player.currentTime = 0;
+      setStopEnabled(false);
+    }
+
+    btnPlay?.addEventListener('click', async () => {
+      if (!stop) return;
+      jacobSays.textContent = `Playing: ${stop.title}`;
+      player.src = stop.audioUrl;
+      await player.play();
+      setStopEnabled(true);
+    });
+
+    btnStop?.addEventListener('click', () => {
+      stopAudio();
+      jacobSays.textContent = 'Stopped.';
+    });
+
+    player?.addEventListener('ended', () => {
+      setStopEnabled(false);
+      jacobSays.textContent = 'Done.';
+    });
+
+    // Mic MVP: use Web Speech API to capture transcript, then decide what to do.
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let rec = null;
+    if (SpeechRecognition) {
+      rec = new SpeechRecognition();
+      rec.lang = 'en-US';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+    } else {
+      micStatus.textContent = 'Mic not supported in this browser.';
+      btnMic.disabled = true;
+    }
+
+    function pickStopFromTranscript(transcript) {
+      const t = transcript.toLowerCase();
+      // If user references another stop explicitly, jump to that.
+      const rules = [
+        { id: 'gold-dollar-building', keys: ['gold dollar'] },
+        { id: 'blackland-neighborhood', keys: ['blackland'] },
+        { id: 'huston-tillotson-university', keys: ['huston', 'tillotson', 'h-t'] },
+        { id: 'rogers-washington-holy-cross-historic-district', keys: ['rogers', 'washington', 'holy cross'] },
+        { id: 'rosewood-courts-emancipation-park', keys: ['rosewood', 'emancipation park'] },
+        { id: 'victory-grill-east-11th-corridor', keys: ['victory grill', 'east 11th', '11th'] },
+      ];
+      for (const r of rules) {
+        if (r.keys.some(k => t.includes(k))) return r.id;
+      }
+      // Default to current stop.
+      if (stopId) return stopId;
+      return null;
+    }
+
+    btnMic?.addEventListener('click', () => {
+      if (!rec) return;
+      micStatus.textContent = 'Listening…';
+      jacobSays.textContent = 'Go ahead.';
+      rec.start();
+    });
+
+    rec?.addEventListener('result', async (ev) => {
+      const transcript = ev.results?.[0]?.[0]?.transcript || '';
+      youSaid.textContent = transcript || '—';
+      micStatus.textContent = 'Processing…';
+
+      const chosenStopId = pickStopFromTranscript(transcript);
+      if (!chosenStopId || !jacobMap.stops[chosenStopId]) {
+        jacobSays.textContent = 'Try asking about one of the stops listed below.';
+        micStatus.textContent = 'Mic idle';
+        return;
+      }
+
+      // Navigate if user asked for a different stop.
+      if (chosenStopId !== stopId) {
+        window.location.href = `/tour/jacob?stop=${encodeURIComponent(chosenStopId)}`;
+        return;
+      }
+
+      const s = jacobMap.stops[chosenStopId];
+      jacobSays.textContent = `Playing: ${s.title}`;
+      player.src = s.audioUrl;
+      await player.play();
+      setStopEnabled(true);
+      micStatus.textContent = 'Mic idle';
+    });
+
+    rec?.addEventListener('error', (e) => {
+      micStatus.textContent = 'Mic error';
+      jacobSays.textContent = 'Could not access speech recognition. You can still press Play.';
+      console.error(e);
+    });
+
+    rec?.addEventListener('end', () => {
+      if (micStatus.textContent === 'Listening…') micStatus.textContent = 'Mic idle';
+    });
+  </script>
+
+  <style>
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+    .head h1 { margin: 0 0 6px; }
+    .sub { margin: 0 0 18px; color: rgba(255,255,255,.75); }
+
+    .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 14px; }
+    .note { margin: 10px 0 0; color: rgba(255,255,255,.7); font-size: 14px; }
+
+    .h2 { margin: 0 0 10px; font-size: 16px; }
+
+    .controls { display: flex; gap: 10px; align-items: center; margin: 8px 0 12px; flex-wrap: wrap; }
+    .btn { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: #fff; cursor: pointer; }
+    .btn.secondary { background: rgba(255,255,255,.04); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .status { color: rgba(255,255,255,.7); font-size: 14px; }
+
+    .panel { margin: 10px 0; }
+    .label { font-size: 12px; color: rgba(255,255,255,.65); margin-bottom: 6px; }
+    .box { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.10); border-radius: 10px; padding: 10px; min-height: 44px; }
+
+    .stops { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+    .stopLink { display: block; padding: 10px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.15); color: #fff; text-decoration: none; }
+    .stopLink.active { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+  </style>
+</BaseLayout>
