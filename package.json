@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.2.0",
     "astro": "^5.17.1",
     "qrcode": "^1.5.4"
   }

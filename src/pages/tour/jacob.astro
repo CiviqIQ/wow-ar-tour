@@ -73,12 +73,12 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
           ))}
         </ul>
 
-        <audio id="player" preload="auto" src={stop ? stop.audioUrl : ""}></audio>
+        <audio id="player" preload="auto" src={stop ? stop.audioUrl : ""} controls style="width:100%"></audio>
       </div>
     </section>
   </main>
 
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script type="module" src="/vendor/model-viewer.min.js"></script>
 
   <script define:vars={{ stopId, stop, jacobMap }}>
     const player = document.getElementById('player');
@@ -101,10 +101,17 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
 
     btnPlay?.addEventListener('click', async () => {
       if (!stop) return;
-      jacobSays.textContent = `Playing: ${stop.title}`;
+      jacobSays.textContent = `Loading audio: ${stop.title}`;
       player.src = stop.audioUrl;
-      await player.play();
-      setStopEnabled(true);
+      try {
+        await player.play();
+        jacobSays.textContent = `Playing: ${stop.title}`;
+        setStopEnabled(true);
+      } catch (err) {
+        console.error('Audio play failed', err);
+        jacobSays.textContent = 'Audio could not start. Try tapping Play again. If you see a browser “blocked” icon, allow sound.';
+        setStopEnabled(false);
+      }
     });
 
     btnStop?.addEventListener('click', () => {
@@ -115,6 +122,12 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
     player?.addEventListener('ended', () => {
       setStopEnabled(false);
       jacobSays.textContent = 'Done.';
+    });
+
+    player?.addEventListener('error', () => {
+      console.error('Audio element error', player?.error);
+      setStopEnabled(false);
+      jacobSays.textContent = 'Audio failed to load. Refresh the page and try again.';
     });
 
     // Mic MVP: use Web Speech API to capture transcript, then decide what to do.
@@ -175,10 +188,17 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
       }
 
       const s = jacobMap.stops[chosenStopId];
-      jacobSays.textContent = `Playing: ${s.title}`;
+      jacobSays.textContent = `Loading audio: ${s.title}`;
       player.src = s.audioUrl;
-      await player.play();
-      setStopEnabled(true);
+      try {
+        await player.play();
+        jacobSays.textContent = `Playing: ${s.title}`;
+        setStopEnabled(true);
+      } catch (err) {
+        console.error('Audio play failed', err);
+        jacobSays.textContent = 'Audio could not start. Press Play to start the stop narration.';
+        setStopEnabled(false);
+      }
       micStatus.textContent = 'Mic idle';
     });
 
