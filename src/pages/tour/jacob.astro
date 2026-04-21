@@ -2,26 +2,22 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import jacobMap from "../../data/jacob_audio_map.json";
 
-const stopId = Astro.url.searchParams.get("stop") || "";
-const stop = (jacobMap.stops && (jacobMap.stops as any)[stopId]) || null;
-
+// Note: this page is built as static HTML, so query params are not available at build time.
+// We resolve stopId client-side in JS.
 const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
   id,
   title: s.title,
 }));
 ---
 
-<BaseLayout title={`Talk to Jacob Fontaine${stop ? ` — ${stop.title}` : ""}`}
+<BaseLayout title="Talk to Jacob Fontaine"
   description="Interactive guide: Jacob Fontaine (prototype)."
 >
   <main class="wrap">
     <header class="head">
       <h1>Talk to Jacob Fontaine</h1>
-      {stop ? (
-        <p class="sub">Current stop: <strong>{stop.title}</strong></p>
-      ) : (
-        <p class="sub">Choose a stop below, or open this page from a tour stop.</p>
-      )}
+      <p class="sub">Current stop: <strong id="currentStop">(not selected)</strong></p>
+      <p class="sub" id="currentStopHelp">Choose a stop below, or open this page from a tour stop.</p>
     </header>
 
     <section class="grid">
@@ -45,7 +41,7 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
         <h2 class="h2">Controls</h2>
 
         <div class="controls">
-          <button id="btnPlay" class="btn" disabled={!stop}>Play stop narration</button>
+          <button id="btnPlay" class="btn" disabled>Play stop narration</button>
           <button id="btnStop" class="btn secondary" disabled>Stop</button>
         </div>
 
@@ -61,26 +57,26 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
 
         <div class="panel">
           <div class="label">Jacob</div>
-          <div id="jacobSays" class="box">{stop ? "Press Play, or ask a question." : "Pick a stop to begin."}</div>
+          <div id="jacobSays" class="box">Pick a stop to begin.</div>
         </div>
 
         <h2 class="h2">Stops</h2>
         <ul class="stops">
           {suggestedStops.map((s) => (
             <li>
-              <a class:list={["stopLink", s.id === stopId ? "active" : ""]} href={`/tour/jacob?stop=${encodeURIComponent(s.id)}`}>{s.title}</a>
+              <a class="stopLink" href={`/tour/jacob?stop=${encodeURIComponent(s.id)}`}>{s.title}</a>
             </li>
           ))}
         </ul>
 
-        <audio id="player" preload="auto" src={stop ? stop.audioUrl : ""} controls style="width:100%"></audio>
+        <audio id="player" preload="auto" src="" controls style="width:100%"></audio>
       </div>
     </section>
   </main>
 
   <script type="module" src="/vendor/model-viewer.min.js"></script>
 
-  <script define:vars={{ stopId, stop, jacobMap }}>
+  <script define:vars={{ jacobMap }}>
     const player = document.getElementById('player');
     const btnPlay = document.getElementById('btnPlay');
     const btnStop = document.getElementById('btnStop');
@@ -98,6 +94,35 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
       player.currentTime = 0;
       setStopEnabled(false);
     }
+
+    let stopId = '';
+    let stop = null;
+
+    function resolveStopFromUrl() {
+      const p = new URLSearchParams(location.search);
+      stopId = p.get('stop') || '';
+      stop = (stopId && jacobMap.stops && jacobMap.stops[stopId]) ? jacobMap.stops[stopId] : null;
+
+      const currentStopEl = document.getElementById('currentStop');
+      const currentStopHelpEl = document.getElementById('currentStopHelp');
+
+      if (stop) {
+        currentStopEl.textContent = stop.title;
+        currentStopHelpEl.textContent = 'Press Play, or ask a question.';
+        btnPlay.disabled = false;
+        jacobSays.textContent = 'Ready.';
+        player.src = stop.audioUrl;
+      } else {
+        currentStopEl.textContent = '(not selected)';
+        currentStopHelpEl.textContent = 'Choose a stop below, or open this page from a tour stop.';
+        btnPlay.disabled = true;
+        jacobSays.textContent = 'Pick a stop to begin.';
+        player.removeAttribute('src');
+        player.load();
+      }
+    }
+
+    resolveStopFromUrl();
 
     btnPlay?.addEventListener('click', async () => {
       if (!stop) return;
