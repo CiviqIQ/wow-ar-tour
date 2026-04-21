@@ -135,11 +135,11 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
       // If user references another stop explicitly, jump to that.
       const rules = [
         { id: 'gold-dollar-building', keys: ['gold dollar'] },
-        { id: 'blackland-neighborhood', keys: ['blackland'] },
+        { id: 'blackland', keys: ['blackland'] },
         { id: 'huston-tillotson-university', keys: ['huston', 'tillotson', 'h-t'] },
-        { id: 'rogers-washington-holy-cross-historic-district', keys: ['rogers', 'washington', 'holy cross'] },
-        { id: 'rosewood-courts-emancipation-park', keys: ['rosewood', 'emancipation park'] },
-        { id: 'victory-grill-east-11th-corridor', keys: ['victory grill', 'east 11th', '11th'] },
+        { id: 'rogers-washington-holy-cross', keys: ['rogers', 'washington', 'holy cross'] },
+        { id: 'rosewood-courts', keys: ['rosewood', 'emancipation park'] },
+        { id: 'victory-grill', keys: ['victory grill', 'east 11th', '11th'] },
       ];
       for (const r of rules) {
         if (r.keys.some(k => t.includes(k))) return r.id;
