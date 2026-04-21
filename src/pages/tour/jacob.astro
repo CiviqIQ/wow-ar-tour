@@ -25,9 +25,11 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
         <div class="viewer">
           <!-- Fast MVP: model-viewer for rendering. Mouth animation + visemes can come later. -->
           <model-viewer
+            id="jacobModel"
             src={jacobMap.model.src}
             camera-controls
             autoplay
+            animation-name="Armature|mixamo.com|Layer0"
             shadow-intensity="0.8"
             exposure="1"
             style="width:100%; height: 420px; background: #0b0b0c; border-radius: 12px;"
@@ -78,6 +80,7 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
 
   <script define:vars={{ jacobMap }}>
     const player = document.getElementById('player');
+    const modelViewer = document.getElementById('jacobModel');
     const btnPlay = document.getElementById('btnPlay');
     const btnStop = document.getElementById('btnStop');
     const btnMic = document.getElementById('btnMic');
@@ -97,6 +100,20 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
 
     let stopId = '';
     let stop = null;
+
+    // Ensure the model plays its idle animation.
+    modelViewer?.addEventListener('load', () => {
+      try {
+        const anims = modelViewer.availableAnimations || [];
+        if (!modelViewer.animationName && anims.length) {
+          modelViewer.animationName = anims[0];
+        }
+        // On some browsers, calling play() helps ensure animations start.
+        if (typeof modelViewer.play === 'function') modelViewer.play();
+      } catch (e) {
+        console.warn('Model animation init failed', e);
+      }
+    });
 
     function resolveStopFromUrl() {
       const p = new URLSearchParams(location.search);
@@ -123,6 +140,93 @@ const suggestedStops = Object.entries(jacobMap.stops).map(([id, s]: any) => ({
     }
 
     resolveStopFromUrl();
+
+    // Mouth animation (MVP): drive mouthOpen morph target based on audio amplitude.
+    let audioCtx = null;
+    let analyser = null;
+    let sourceNode = null;
+    let dataArray = null;
+    let rafId = null;
+
+    function findMouthOpenTargets() {
+      // Best-effort: reach into the underlying three.js scene graph.
+      const targets = [];
+      try {
+        const scene = modelViewer?.model?.scene || modelViewer?.scene;
+        if (!scene || typeof scene.traverse !== 'function') return targets;
+
+        scene.traverse((obj) => {
+          if (!obj || !obj.morphTargetDictionary || !obj.morphTargetInfluences) return;
+          const idx = obj.morphTargetDictionary['mouthOpen'];
+          if (typeof idx === 'number') {
+            targets.push({ obj, idx });
+          }
+        });
+      } catch (e) {
+        console.warn('Could not locate morph targets', e);
+      }
+      return targets;
+    }
+
+    let mouthTargets = [];
+
+    function setMouth(value) {
+      for (const t of mouthTargets) {
+        t.obj.morphTargetInfluences[t.idx] = value;
+      }
+    }
+
+    function startMouthLoop() {
+      if (!analyser || !dataArray) return;
+      if (!mouthTargets.length) mouthTargets = findMouthOpenTargets();
+
+      const tick = () => {
+        rafId = requestAnimationFrame(tick);
+        if (player.paused || player.ended) {
+          setMouth(0);
+          return;
+        }
+        analyser.getByteTimeDomainData(dataArray);
+        // Compute RMS-ish level (0..1)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = (dataArray[i] - 128) / 128;
+          sum += v * v;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        // Tune sensitivity and clamp
+        const mouth = Math.max(0, Math.min(1, rms * 4.0));
+        setMouth(mouth);
+      };
+
+      if (!rafId) tick();
+    }
+
+    function ensureAudioAnalyser() {
+      if (analyser) return;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+        dataArray = new Uint8Array(analyser.fftSize);
+        sourceNode = audioCtx.createMediaElementSource(player);
+        sourceNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        startMouthLoop();
+      } catch (e) {
+        console.warn('WebAudio analyser init failed', e);
+      }
+    }
+
+    // Initialize analyser on first user interaction with the audio element.
+    player?.addEventListener('play', () => {
+      ensureAudioAnalyser();
+      // Some browsers start audio contexts suspended.
+      audioCtx?.resume?.();
+    });
+
+    player?.addEventListener('pause', () => setMouth(0));
+    player?.addEventListener('ended', () => setMouth(0));
 
     function nudgePlayer() {
       player.scrollIntoView({ behavior: 'smooth', block: 'center' });
