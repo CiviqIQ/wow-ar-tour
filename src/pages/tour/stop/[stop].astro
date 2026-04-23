@@ -71,6 +71,9 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
                 {stop.mapUrl ? <a class="btn" href={stop.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={stop.id}>Map It</a> : null}
                 <a class="btn" href={`/tour/jacob?stop=${encodeURIComponent(stop.id)}`} data-evt="talk_to_jacob" data-stop={stop.id}>Talk to Jacob</a>
+                {stop.id === 'rosewood-courts' ? (
+                  <a class="btn" href="/tour/rosewood/quick-answers/" data-evt="rosewood_quick_answers" data-stop={stop.id}>Rosewood Quick Answers</a>
+                ) : null}
                 <a class="btn" href="https://whatoncewas.org/ar-tour-our-stories-our-streets/" target="_blank" rel="noreferrer" data-evt="orig_page" data-stop={stop.id}>Original tour page</a>
               </div>
 

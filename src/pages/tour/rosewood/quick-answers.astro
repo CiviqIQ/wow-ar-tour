@@ -1,0 +1,152 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const segments = [
+  {
+    id: "where_you_are",
+    label: "Where you are",
+    audioUrl: "/media/jacob/audio/segments/rosewood__where-you-are_v1.mp3",
+    script:
+      "If you travel southbound from the intersection of 12th Street and Chicon Street toward Huston-Tillotson University, you'll make it to the bottom of a short hill, maybe without knowing how unique of a position you're actually in.",
+  },
+  {
+    id: "why_it_matters",
+    label: "Why it matters",
+    audioUrl: "/media/jacob/audio/segments/rosewood__why-it-matters_v1.mp3",
+    script:
+      "These grounds hold our challenges and our triumphs, where families found homes and where we reclaimed our freedom. This is a uniquely wondrous historical site in more ways than one.",
+  },
+  {
+    id: "what_is_this_place",
+    label: "What is this place",
+    audioUrl: "/media/jacob/audio/segments/rosewood__rosewood-courts-what-it-is_v1.mp3",
+    script:
+      "On the corner of Rosewood and Chicon, Rosewood Courts, the first public housing project for African Americans in the United States, has been home to East Austin residents since 1939.",
+  },
+  {
+    id: "key_fact",
+    label: "Key fact",
+    audioUrl: "/media/jacob/audio/segments/rosewood__new-deal-and-lbj_v1.mp3",
+    script:
+      "This community of homes was established as part of President Franklin D. Roosevelt's New Deal and also was lobbied for by then-Congressman Lyndon Baines Johnson, or LBJ.",
+  },
+  {
+    id: "deeper_history",
+    label: "Deeper history",
+    audioUrl: "/media/jacob/audio/segments/rosewood__emancipation-park-juneteenth_v1.mp3",
+    script:
+      "The site of Rosewood Courts here was originally Emancipation Park, an extremely important social and recreational site where Juneteenth celebrations date all the way back to 1930. This is where Black families reunited to publicly celebrate our freedom and progress on our own terms.",
+  },
+  {
+    id: "wrap",
+    label: "Wrap",
+    audioUrl: "/media/jacob/audio/segments/rosewood__thomas-j-white-and-wrap_v1.mp3",
+    script:
+      "This land was originally bought by a formerly enslaved man named Thomas J. White. Once he started the Emancipation Park Association back in 1905, he bought a five-acre tract right here within two years' time. So it's fitting that this place sits at the bottom of a hill, because the stories and significance run deep.",
+  },
+];
+---
+
+<BaseLayout
+  title="Rosewood — Quick Answers (Jacob Fontaine)"
+  description="Short, question-based audio segments for Rosewood Courts & Emancipation Park."
+>
+  <main class="wrap">
+    <header class="head">
+      <h1>Rosewood — Quick Answers</h1>
+      <p class="sub">
+        Prototype for in-tour context review. Tap a question to load audio; use the audio controls to play.
+      </p>
+      <p class="sub">
+        <a class="link" href="/tour/stop/rosewood-courts">Back to Rosewood stop</a>
+      </p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2 class="h2">Questions</h2>
+        <div class="buttons">
+          {segments.map((s) => (
+            <button class="btn" data-audio={s.audioUrl} data-script={s.script}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+
+        <div class="panel">
+          <div class="label">Jacob says</div>
+          <div id="jacobSays" class="box">Select a question above.</div>
+        </div>
+
+        <audio id="player" controls preload="auto" style="width:100%"></audio>
+        <p class="note">If Play is blocked, use the audio player controls directly.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="h2">Jacob (preview)</h2>
+        <model-viewer
+          id="jacobModel"
+          src="/media/jacob/models/jacob-fontaine.glb"
+          camera-controls
+          autoplay
+          animation-name="Armature|mixamo.com|Layer0"
+          shadow-intensity="0.8"
+          exposure="1"
+          style="width:100%; height: 420px; background: #0b0b0c; border-radius: 12px;"
+          alt="Jacob Fontaine 3D model"
+        ></model-viewer>
+        <p class="note">This is just for review context on staging (not 8th Wall).</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/vendor/model-viewer.min.js"></script>
+
+  <script>
+    const player = document.getElementById('player');
+    const jacobSays = document.getElementById('jacobSays');
+    const btns = Array.from(document.querySelectorAll('button[data-audio]'));
+
+    function nudgePlayer() {
+      player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      player.classList.add('flash');
+      setTimeout(() => player.classList.remove('flash'), 900);
+    }
+
+    btns.forEach((b) => {
+      b.addEventListener('click', () => {
+        const audio = b.getAttribute('data-audio');
+        const script = b.getAttribute('data-script');
+        jacobSays.textContent = script || '';
+        player.src = audio;
+        player.load();
+        nudgePlayer();
+      });
+    });
+  </script>
+
+  <style>
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+    .head h1 { margin: 0 0 6px; }
+    .sub { margin: 0 0 10px; color: rgba(255,255,255,.75); }
+    .link { color: #fff; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 14px; }
+    .note { margin: 10px 0 0; color: rgba(255,255,255,.7); font-size: 14px; }
+    .h2 { margin: 0 0 10px; font-size: 16px; }
+
+    .buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 680px) { .buttons { grid-template-columns: 1fr 1fr; } }
+
+    .btn { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: #fff; cursor: pointer; text-align: left; }
+
+    .panel { margin: 10px 0 12px; }
+    .label { font-size: 12px; color: rgba(255,255,255,.65); margin-bottom: 6px; }
+    .box { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.10); border-radius: 10px; padding: 10px; min-height: 72px; }
+
+    audio.flash { outline: 2px solid rgba(215, 180, 106, .9); outline-offset: 3px; border-radius: 10px; }
+  </style>
+</BaseLayout>
