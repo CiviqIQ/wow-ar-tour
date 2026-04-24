@@ -12,6 +12,6 @@
     "@google/model-viewer": "^4.2.0",
     "astro": "^5.17.1",
     "qrcode": "^1.5.4",
-    "three": "^0.170.0"
+    "three": "^0.182.0"
   }
 }
