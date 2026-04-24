@@ -155,22 +155,79 @@ const segments = [
     const loader = new GLTFLoader();
     let root = null;
     let mouthTargets = [];
+    let jawBone = null;
 
-    function findMouthOpenTargets(obj) {
+    function listMorphTargets(obj) {
+      const found = new Set();
+      obj.traverse((n) => {
+        if (!n.isMesh) return;
+        const dict = n.morphTargetDictionary;
+        if (!dict) return;
+        for (const k of Object.keys(dict)) found.add(k);
+      });
+      return Array.from(found).sort();
+    }
+
+    function findMouthTargets(obj) {
       const out = [];
+      const preferredKeys = [
+        'mouthOpen',
+        'jawOpen',
+        'JawOpen',
+        'viseme_aa',
+        'viseme_O',
+        'viseme_oh',
+      ];
+
       obj.traverse((n) => {
         if (!n.isMesh) return;
         const dict = n.morphTargetDictionary;
         const infl = n.morphTargetInfluences;
         if (!dict || !infl) return;
-        const idx = dict['mouthOpen'];
-        if (typeof idx === 'number') out.push({ mesh: n, idx });
+
+        // Try preferred keys first.
+        for (const key of preferredKeys) {
+          const idx = dict[key];
+          if (typeof idx === 'number') out.push({ mesh: n, idx });
+        }
+
+        // Fallback: any morph name containing 'mouth' or 'jaw'
+        for (const [key, idx] of Object.entries(dict)) {
+          if (typeof idx !== 'number') continue;
+          const k = String(key).toLowerCase();
+          if (k.includes('mouth') || k.includes('jaw')) out.push({ mesh: n, idx });
+        }
       });
-      return out;
+
+      // Deduplicate by mesh+idx
+      const dedup = new Map();
+      for (const t of out) dedup.set(`${t.mesh.uuid}:${t.idx}`, t);
+      return Array.from(dedup.values());
+    }
+
+    function findJawBone(obj) {
+      let found = null;
+      obj.traverse((n) => {
+        if (found) return;
+        if (!n.isBone) return;
+        const name = (n.name || '').toLowerCase();
+        if (name === 'jaw' || name.includes('jaw')) found = n;
+      });
+      return found;
     }
 
     function setMouth(v) {
-      for (const t of mouthTargets) t.mesh.morphTargetInfluences[t.idx] = v;
+      // Morph targets (preferred)
+      if (mouthTargets.length) {
+        for (const t of mouthTargets) t.mesh.morphTargetInfluences[t.idx] = v;
+        return;
+      }
+
+      // Bone fallback (rotate jaw slightly)
+      if (jawBone) {
+        // Assume default is closed; rotate down around X a bit.
+        jawBone.rotation.x = -0.35 * v;
+      }
     }
 
     // Best-effort eye de-spook: if an eye material is pure white, darken it.
@@ -196,7 +253,17 @@ const segments = [
         root = gltf.scene;
         scene.add(root);
         tweakMaterials(root);
-        mouthTargets = findMouthOpenTargets(root);
+        const morphs = listMorphTargets(root);
+        console.log('[Jacob preview] morph targets:', morphs);
+
+        mouthTargets = findMouthTargets(root);
+        jawBone = findJawBone(root);
+        console.log('[Jacob preview] mouthTargets:', mouthTargets.map(t => ({ mesh: t.mesh.name, idx: t.idx })));
+        console.log('[Jacob preview] jawBone:', jawBone?.name || null);
+
+        if (!mouthTargets.length && !jawBone) {
+          console.warn('[Jacob preview] No mouth/jaw targets found. Model likely lacks facial rig/blendshapes.');
+        }
 
         // Frame head/shoulders and keep a little extra space so it doesn't feel claustrophobic.
         camera.position.set(0.12, 1.62, 0.9);
