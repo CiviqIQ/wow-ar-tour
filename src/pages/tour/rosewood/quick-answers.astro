@@ -93,10 +93,18 @@ const segments = [
     </section>
   </main>
 
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.182.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.182.0/examples/jsm/"
+      }
+    }
+  </script>
+
   <script type="module">
-    // NOTE: Inline module scripts in Astro static builds don't get bundled, so we use explicit ESM URLs.
-    import * as THREE from 'https://unpkg.com/three@0.182.0/build/three.module.js';
-    import { GLTFLoader } from 'https://unpkg.com/three@0.182.0/examples/jsm/loaders/GLTFLoader.js';
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     const player = document.getElementById('player');
     const jacobSays = document.getElementById('jacobSays');
