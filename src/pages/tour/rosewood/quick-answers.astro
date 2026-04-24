@@ -139,7 +139,7 @@ const segments = [
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.75;
+    renderer.toneMappingExposure = 0.85;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#0b0b0c');
@@ -158,7 +158,7 @@ const segments = [
 
     // Softer lighting to avoid blown-out eyes.
     scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 0.95));
-    const key = new THREE.DirectionalLight(0xffffff, 0.7);
+    const key = new THREE.DirectionalLight(0xffffff, 0.85);
     key.position.set(2, 3, 2);
     scene.add(key);
     const fill = new THREE.DirectionalLight(0xffffff, 0.25);
@@ -247,29 +247,34 @@ const segments = [
       }
     }
 
-    // Best-effort eye de-spook: clamp eye-related materials away from pure white + remove emissive/gloss.
+    // Best-effort eye de-spook: replace eye materials that render as pure white.
     function tweakMaterials(obj) {
       obj.traverse((n) => {
         if (!n.isMesh) return;
+        const nameN = (n.name || '').toLowerCase();
         const mats = Array.isArray(n.material) ? n.material : [n.material];
-        for (const m of mats) {
-          if (!m) continue;
-          const name = (m.name || n.name || '').toLowerCase();
+
+        const newMats = mats.map((m) => {
+          if (!m) return m;
+          const name = (m.name || nameN || '').toLowerCase();
           const isEye = name.includes('eye') || name.includes('cornea') || name.includes('iris') || name.includes('sclera');
-          if (!isEye) continue;
+          if (!isEye) return m;
 
-          // If textures didn't come through, eyes can end up as a glowing white material.
-          if (m.color) {
-            // Light gray instead of pure white.
-            m.color.setRGB(0.55, 0.55, 0.55);
-          }
+          // If textures didn’t come through, eyes often become a bright/flat white. Force a sane material.
+          const forced = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0.35, 0.35, 0.35),
+            metalness: 0.0,
+            roughness: 1.0,
+          });
+          forced.name = (m.name || n.name || 'eye') + '__forced';
+          return forced;
+        });
 
-          if ('emissive' in m && m.emissive) m.emissive.setRGB(0, 0, 0);
-          if ('emissiveIntensity' in m) m.emissiveIntensity = 0.0;
-          if ('metalness' in m) m.metalness = 0.0;
-          if ('roughness' in m) m.roughness = 1.0;
-
-          m.needsUpdate = true;
+        // Re-apply material(s) if we changed anything
+        if (Array.isArray(n.material)) {
+          n.material = newMats;
+        } else {
+          n.material = newMats[0];
         }
       });
     }
@@ -308,7 +313,8 @@ const segments = [
 
         // Place camera for a head/shoulders framing.
         const lookY = size.y * 0.22;
-        camera.position.set(0.12, lookY + size.y * 0.03, fitDist * 0.85);
+        // Zoom closer than the full fit distance.
+        camera.position.set(0.12, lookY + size.y * 0.03, fitDist * 0.70);
         camera.lookAt(0, lookY, 0);
 
         camBasePos = camera.position.clone();
