@@ -94,12 +94,17 @@ const segments = [
   </main>
 
   <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+    // NOTE: Inline module scripts in Astro static builds don't get bundled, so we use explicit ESM URLs.
+    import * as THREE from 'https://unpkg.com/three@0.182.0/build/three.module.js';
+    import { GLTFLoader } from 'https://unpkg.com/three@0.182.0/examples/jsm/loaders/GLTFLoader.js';
 
     const player = document.getElementById('player');
     const jacobSays = document.getElementById('jacobSays');
     const btns = Array.from(document.querySelectorAll('button[data-audio]'));
+
+    // Surface module-load failures loudly.
+    window.addEventListener('error', (e) => console.error('[Jacob preview] window error', e?.message || e, e));
+    window.addEventListener('unhandledrejection', (e) => console.error('[Jacob preview] unhandledrejection', e?.reason || e));
 
     // --- Audio segment UI ---
     function nudgePlayer() {
