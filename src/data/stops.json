@@ -8,16 +8,6 @@
       "name": "Jacob Fontaine",
       "tagline": "Historic guide",
       "bio": "A historic guide for the tour experience."
-    },
-    {
-      "id": "teyah",
-      "name": "Teyah",
-      "tagline": "AI-enabled tour guide (prototype)",
-      "bio": "Teyah is the prototype for our AI-enabled tour guide — an African American girl (ages 8–12) with a curious, brave, friendly kid-reporter vibe.",
-      "image": {
-        "src": "/media/guides/teyah.jpg",
-        "alt": "Teyah — AI-enabled tour guide prototype"
-      }
     }
   ],
   "overview": {
