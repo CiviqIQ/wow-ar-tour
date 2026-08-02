@@ -13,7 +13,7 @@ const description = 'Discover Austin’s African American history through an imm
   <SiteHeader />
 
   <section class="tour-hero">
-    <div class="tour-hero__image" role="img" aria-label="Historic East Austin neighborhood"></div>
+    <div class="tour-hero__image" role="img" aria-label="Children at Rosewood Courts in August 1943"></div>
     <div class="tour-hero__shade"></div>
     <div class="container tour-hero__content">
       <p class="eyebrow">Jacob Fontaine AR Tour</p>
@@ -70,7 +70,7 @@ const description = 'Discover Austin’s African American history through an imm
 
       <div class="stop-grid">
         {data.stops.map((s, index) => (
-          <article class="stop-card">
+          <article class={`stop-card stop-card--${s.id}`}>
             <a class="stop-card__image" href={`/tour/stop/${s.id}/?g=${guide.id}`} data-evt="view_stop" data-stop={s.id}>
               <img src={s.image.src} alt={s.name} loading="lazy" />
               <span class="stop-card__number">{String(index + 1).padStart(2, '0')}</span>
