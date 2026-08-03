@@ -1,13 +1,18 @@
 {
   "tourId": "our-stories-our-streets",
   "tourName": "Our Stories, Our Streets",
-  "character": {
-    "id": "jacob-fontaine",
-    "name": "Jacob Fontaine"
-  },
+  "defaultGuideId": "jacob-fontaine",
+  "guides": [
+    {
+      "id": "jacob-fontaine",
+      "name": "Jacob Fontaine",
+      "tagline": "Historic guide",
+      "bio": "A historic guide for the tour experience."
+    }
+  ],
   "overview": {
     "headline": "Our Stories, Our Streets",
-    "subhead": "An AR walking tour guided by Jacob Fontaine",
+    "subhead": "An AR walking tour guided by community stories",
     "body": "Step into Austin’s Black history through an immersive AR walking tour. At each stop, you’ll unlock a short story that connects place, people, and legacy—bringing the past into view on the streets where it happened.",
     "howItWorks": [
       "Choose a stop (or follow the route in order).",
@@ -42,8 +47,8 @@
       "arUrl": "https://froliq.8thwall.app/jacob-fontaine/",
       "description": "A neighborhood story of home, change, and community identity—told through the places that shaped daily life.",
       "image": {
-        "src": "/media/stops/blackland/hero.jpg",
-        "creditName": "Placeholder (temporary)",
+        "src": "/media/stops/blackland/blackland-chase-building.jpg",
+        "creditName": "What Once Was collection",
         "creditUrl": ""
       }
     },
@@ -68,9 +73,9 @@
       "arUrl": "http://8th.io/x4a4j",
       "description": "A window into everyday life, resilience, and the systems that shaped housing and opportunity in East Austin.",
       "image": {
-        "src": "/media/stops/rosewood-courts/main.jpg",
-        "creditName": "Wikimedia Commons",
-        "creditUrl": "https://commons.wikimedia.org/wiki/File:Rosewood_courts_one_story.jpg"
+        "src": "/media/stops/rosewood-courts/rosewood-project-1943.jpg",
+        "creditName": "What Once Was collection",
+        "creditUrl": ""
       }
     },
     {

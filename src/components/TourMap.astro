@@ -1,0 +1,133 @@
+---
+const { guideId = 'jacob-fontaine' } = Astro.props;
+
+const stops = [
+  { id: 'gold-dollar-building', n: '01', name: 'Gold Dollar Building', address: '2402 San Gabriel St', x: 430, y: 127, side: 'right', description: 'Home of one of the first Black newspapers in the United States.' },
+  { id: 'blackland', n: '02', name: 'Blackland', address: 'Poquito St & E 22nd St', x: 919, y: 257, side: 'above', description: 'A historic neighborhood and pioneer in grassroots anti-gentrification.' },
+  { id: 'rogers-washington-holy-cross', n: '03', name: 'Rogers Washington Holy Cross', address: 'Chestnut Ave & E 22nd St', x: 1170, y: 267, side: 'below', description: 'Austin’s first local historic district honoring African American heritage.' },
+  { id: 'rosewood-courts', n: '04', name: 'Rosewood Courts', address: '1141 Chicon St', x: 976, y: 681, side: 'right', description: 'The first public housing built for African Americans in the United States.' },
+  { id: 'huston-tillotson-university', n: '05', name: 'Huston–Tillotson University', address: '900 Chicon St', x: 965, y: 749, side: 'right', description: 'An HBCU and Austin’s oldest institution of higher learning.' },
+  { id: 'victory-grill', n: '06', name: 'Victory Grill', address: '1104 E 11th St', x: 788, y: 662, side: 'left', description: 'A historic music venue that was part of the Chitlin’ Circuit.' }
+];
+
+const routeUrl = 'https://www.google.com/maps/dir/?api=1&origin=2402+San+Gabriel+St,+Austin,+TX+78705&destination=1104+E+11th+St,+Austin,+TX+78702&waypoints=Poquito+St+and+E+22nd+St,+Austin,+TX%7CChestnut+Ave+and+E+22nd+St,+Austin,+TX%7C1141+Chicon+St,+Austin,+TX%7C900+Chicon+St,+Austin,+TX+78702&travelmode=walking';
+---
+
+<section class="tour-map section" aria-labelledby="tour-map-title" data-tour-map>
+  <div class="container">
+    <header class="tour-map__header">
+      <p class="section-label">Explore the route</p>
+      <h2 class="display-heading" id="tour-map-title">Tour at a glance</h2>
+      <p>Six places. One connected story. Follow the route through East Austin and discover the people, businesses, and communities that shaped the neighborhood.</p>
+      <p class="tour-map__instruction"><span aria-hidden="true">i</span> Select a numbered stop to preview its story.</p>
+    </header>
+
+    <figure class="map-figure">
+      <div class="map-plate">
+        <svg class="map-art" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrated map of six tour stops across central and East Austin">
+          <defs><pattern id="map-grid" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M80 0H0V80" fill="none" stroke="#d8d3ca" stroke-width="1" /></pattern></defs>
+          <rect width="1600" height="900" fill="#fffaf2" />
+          <rect width="1600" height="900" fill="url(#map-grid)" />
+          <rect x="430" y="100" width="270" height="250" fill="#eee9df" />
+          <path d="M0 848 C180 838 420 862 700 872 L700 900 L0 900Z" fill="#cfe8f8" />
+          <g class="streets">
+            <path d="M971 0V900 M1170 0V900 M880 0V900 M919 0V900 M503 0V900 M430 0V900 M0 614H1600 M0 662H1600 M0 802H1600" />
+            <path d="M630 900L1100 420 M820 0L1260 520 M1250 0L1500 900" />
+          </g>
+          <g class="arterials"><path d="M0 257H1600 M0 357H1600 M0 847H1600" /></g>
+          <g class="interstate"><path class="i35-case" d="M834 0L800 257L754 529L713 662L663 847L655 900"/><path class="i35-road" d="M834 0L800 257L754 529L713 662L663 847L655 900"/><path class="i35-mid" d="M834 0L800 257L754 529L713 662L663 847L655 900"/></g>
+          <g class="map-labels">
+            <text x="45" y="242">E DEAN KEETON ST</text><text x="55" y="342">E MLK JR BLVD</text>
+            <text x="990" y="595">E 12TH ST</text><text x="990" y="790">E 7TH ST</text>
+            <text x="1000" y="470" transform="rotate(90 1000 470)">CHICON ST</text>
+            <text x="1198" y="420" transform="rotate(90 1198 420)">CHESTNUT AVE</text>
+            <text x="675" y="300" transform="rotate(-82 675 300)">I–35</text>
+            <text class="district" x="475" y="205">UT AUSTIN</text><text class="district" x="480" y="760">DOWNTOWN</text>
+          </g>
+          <g class="route-lines">
+            <path class="route-segment crossing" data-segment="0" d="M430 127L919 257" />
+            <path class="route-segment" data-segment="1" d="M919 257L1170 267" />
+            <path class="route-segment" data-segment="2" d="M1170 267L1170 614L976 614L976 681" />
+            <path class="route-segment" data-segment="3" d="M976 681L971 715L965 749" />
+            <path class="route-segment" data-segment="4" d="M965 749L900 749L860 745L788 662" />
+          </g>
+          <g class="scale"><path d="M380 836V846H476V836"/><text x="380" y="826">¼ MILE</text></g>
+        </svg>
+
+        <div class="north" aria-hidden="true"><i></i><span>N</span></div>
+
+        {stops.map((stop, index) => (
+          <button class={`map-marker map-marker--${stop.side}`} style={`--x:${stop.x / 16}%;--y:${stop.y / 9}%`} type="button" data-marker={index} aria-pressed="false" aria-label={`Stop ${stop.n}: ${stop.name}. ${stop.description}`}>
+            <span class="map-marker__square">{stop.n}</span><span class="map-marker__name">{stop.name}</span>
+          </button>
+        ))}
+
+        {stops.map((stop, index) => (
+          <aside class="map-preview" data-preview={index} role="dialog" aria-label="Stop preview" hidden>
+            <span class="map-preview__number">{stop.n}</span>
+            <div><h3>{stop.name}</h3><p>{stop.description}</p><small>{stop.address}</small><a href={`/tour/stop/${stop.id}/?g=${guideId}`}>View this stop <span aria-hidden="true">→</span></a></div>
+          </aside>
+        ))}
+      </div>
+    </figure>
+
+    <div class="map-legend" aria-label="Map legend"><span><i class="solid"></i>Tour route</span><span><i class="dashed"></i>Connection across I–35</span><span><b>01</b>Numbers match the stories below</span></div>
+
+    <div class="map-stop-list" aria-label="All six tour stops">
+      {stops.map((stop, index) => (
+        <button type="button" data-list-stop={index}><b>{stop.n}</b><span><strong>{stop.name}</strong><small>{stop.description}</small></span></button>
+      ))}
+    </div>
+
+    <a class="btn map-directions" href={routeUrl} target="_blank" rel="noopener noreferrer">Open route in Google Maps <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-tour-map]').forEach((root) => {
+    const markers = [...root.querySelectorAll('[data-marker]')];
+    const listItems = [...root.querySelectorAll('[data-list-stop]')];
+    const previews = [...root.querySelectorAll('[data-preview]')];
+    const segments = [...root.querySelectorAll('[data-segment]')];
+    let selected = null;
+
+    const show = (index, commit = false) => {
+      const active = index === null ? selected : index;
+      if (commit) selected = selected === index ? null : index;
+      const current = commit ? selected : active;
+      markers.forEach((el, i) => { el.classList.toggle('is-active', i === current); el.setAttribute('aria-pressed', String(i === selected)); });
+      listItems.forEach((el, i) => el.classList.toggle('is-active', i === current));
+      previews.forEach((el, i) => el.hidden = i !== current);
+      segments.forEach((el, i) => el.classList.toggle('is-active', current !== null && (i === current || i === current - 1)));
+      root.classList.toggle('has-active', current !== null);
+    };
+
+    markers.forEach((el, index) => {
+      el.addEventListener('click', () => show(index, true));
+      el.addEventListener('mouseenter', () => show(index));
+      el.addEventListener('mouseleave', () => show(null));
+      el.addEventListener('focus', () => show(index));
+      el.addEventListener('blur', () => show(null));
+    });
+    listItems.forEach((el, index) => el.addEventListener('click', () => show(index, true)));
+    window.addEventListener('keydown', (event) => { if (event.key === 'Escape') { selected = null; show(null, true); } });
+  });
+</script>
+
+<style>
+  .tour-map{background:var(--cream);border-top:1px solid var(--line)}
+  .tour-map__header{max-width:760px;margin-bottom:28px}.tour-map__header>p:not(.section-label):not(.tour-map__instruction){color:var(--muted);font-size:1.05rem}
+  .tour-map__instruction{display:flex;align-items:center;gap:8px;margin:20px 0 0;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.tour-map__instruction span{display:grid;place-items:center;width:19px;height:19px;border:1px solid var(--ink);border-radius:50%}
+  .map-figure{margin:0;border:1px solid #cfc8bb;background:var(--paper);box-shadow:0 15px 35px rgba(32,36,38,.08)}.map-plate{position:relative;aspect-ratio:16/9;overflow:hidden}.map-art{position:absolute;inset:0;width:100%;height:100%}
+  .streets{fill:none;stroke:#bcb8b0;stroke-width:2.5}.arterials{fill:none;stroke:#96938d;stroke-width:4}.i35-case,.i35-road,.i35-mid{fill:none}.i35-case{stroke:#f7f4ee;stroke-width:16}.i35-road{stroke:#92908a;stroke-width:9}.i35-mid{stroke:#f7f4ee;stroke-width:2;stroke-dasharray:10 12}
+  .map-labels{font:700 21px 'Barlow Condensed',sans-serif;letter-spacing:.1em;fill:#575756}.map-labels .district{font-size:26px;letter-spacing:.22em;fill:#77736d}.route-segment{fill:none;stroke:var(--blue);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;transition:opacity .14s,stroke-width .14s}.route-segment.crossing{stroke-dasharray:22 16}.has-active .route-segment{opacity:.28}.has-active .route-segment.is-active{opacity:1;stroke:var(--blue-dark);stroke-width:11}.scale{fill:none;stroke:#595959;stroke-width:2}.scale text{fill:#595959;stroke:none;font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.12em}
+  .north{position:absolute;right:18px;top:18px;display:grid;place-items:center;font:800 14px 'Barlow Condensed',sans-serif;letter-spacing:.12em}.north i{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid var(--ink)}
+  .map-marker{position:absolute;left:var(--x);top:var(--y);z-index:4;display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;color:var(--ink);font:700 16px 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transform:translate(-22px,-50%)}.map-marker--left{flex-direction:row-reverse;transform:translate(calc(-100% + 22px),-50%)}.map-marker--above{flex-direction:column-reverse;gap:5px;transform:translate(-50%,calc(-100% + 22px))}.map-marker--below{flex-direction:column;align-items:flex-end;gap:5px;transform:translate(calc(-100% + 22px),-22px)}
+  .map-marker__square{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border:2px solid var(--blue-dark);background:var(--paper);color:var(--blue-dark);box-shadow:0 3px 9px rgba(0,0,0,.14);font-size:19px;transition:.14s ease}.map-marker__name{padding:3px 8px;border:1px solid #cfc8bb;background:var(--paper);white-space:nowrap}.map-marker:is(:hover,:focus-visible,.is-active){z-index:6}.map-marker:is(:hover,:focus-visible,.is-active) .map-marker__square{background:var(--blue-dark);color:#fff;transform:scale(1.08)}.map-marker:is(:hover,:focus-visible,.is-active) .map-marker__name{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff}.map-marker:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+  .map-preview{position:absolute;z-index:9;left:50%;bottom:22px;transform:translateX(-50%);display:grid;grid-template-columns:34px 1fr;gap:12px;width:min(420px,calc(100% - 44px));padding:17px 18px;background:var(--paper);border:1px solid var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.2)}.map-preview[hidden]{display:none}.map-preview__number{display:grid;place-items:center;width:32px;height:32px;background:var(--blue-dark);color:#fff;font:800 16px 'Barlow Condensed',sans-serif}.map-preview h3{margin:0;font:800 1.35rem/1 'Barlow Condensed',sans-serif;text-transform:uppercase}.map-preview p{margin:7px 0;color:var(--muted);font-size:.82rem;line-height:1.4}.map-preview small{display:block;color:var(--muted);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase}.map-preview a{display:inline-block;margin-top:10px;color:var(--blue-dark);font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+  .map-legend{display:flex;flex-wrap:wrap;gap:18px;margin:18px 0 25px;color:var(--muted);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.map-legend span{display:flex;align-items:center;gap:8px}.map-legend i{display:block;width:30px;border-top:5px solid var(--blue)}.map-legend i.dashed{border-top-style:dashed}.map-legend b{display:grid;place-items:center;width:22px;height:22px;border:1px solid var(--blue-dark);color:var(--blue-dark);font:700 11px 'Barlow Condensed',sans-serif}
+  .map-stop-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px}.map-stop-list button{display:flex;align-items:flex-start;gap:10px;padding:13px;text-align:left;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}.map-stop-list button.is-active{border-color:var(--blue-dark);background:#e8f3fc;box-shadow:inset 0 0 0 1px var(--blue-dark)}.map-stop-list b{display:grid;place-items:center;width:29px;height:29px;flex:0 0 29px;border:1px solid var(--blue-dark);color:var(--blue-dark);font:800 14px 'Barlow Condensed',sans-serif}.map-stop-list strong,.map-stop-list small{display:block}.map-stop-list strong{font:800 1rem/1.05 'Barlow Condensed',sans-serif;text-transform:uppercase}.map-stop-list small{margin-top:5px;color:var(--muted);font-size:.72rem;line-height:1.35}.map-directions{border-color:var(--blue-dark)}
+  @media(max-width:1000px){.map-plate{aspect-ratio:1.31}.map-art{width:152%;left:-29%}.map-stop-list{grid-template-columns:repeat(2,minmax(0,1fr))}.map-marker__name{font-size:14px}}
+  @media(max-width:620px){.map-plate{aspect-ratio:1.04}.map-art{width:170%;left:-37%}.map-labels{display:none}.map-marker{gap:0}.map-marker__name{display:none}.map-marker,.map-marker--left,.map-marker--above,.map-marker--below{transform:translate(-22px,-22px)}.map-preview{position:relative;left:0;bottom:auto;transform:none;width:100%;border-width:1px 0 0;box-shadow:none}.map-stop-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.map-stop-list button{flex:0 0 78%;scroll-snap-align:start}.map-legend{gap:12px}.north{right:12px;top:12px}}
+  @media(prefers-reduced-motion:reduce){.route-segment,.map-marker__square{transition:none}}
+</style>

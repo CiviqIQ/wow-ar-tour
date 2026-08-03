@@ -1,80 +1,144 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
+import TourMap from '../../components/TourMap.astro';
 import data from '../../data/stops.json';
 
-const title = `Jacob Fontaine AR Tour | ${data.tourName}`;
-const description = 'Scan a QR code, choose a stop, then launch the AR story experience (8th Wall) in a new tab.';
+const guideId = Astro.url.searchParams.get('g') || data.defaultGuideId;
+const guide = data.guides.find((x) => x.id === guideId) || data.guides[0];
+const title = `${data.tourName} | What Once Was`;
+const description = 'Discover Austin’s African American history through an immersive, self-guided augmented reality tour.';
 ---
 
 <BaseLayout title={title} description={description}>
   <SiteHeader />
 
-  <section class="section">
-    <div class="container">
-      <span class="badge">{data.character.name} • AR Tour</span>
-      <h1 class="h1">{data.overview.headline}</h1>
-      <p class="p">{data.overview.subhead}</p>
-      <p class="p">{data.overview.body}</p>
+  <section class="tour-hero">
+    <div class="tour-hero__image" role="img" aria-label="Children at Rosewood Courts in August 1943"></div>
+    <div class="tour-hero__shade"></div>
+    <div class="container tour-hero__content">
+      <p class="eyebrow">Jacob Fontaine AR Tour</p>
+      <h1 class="tour-title"><span>Our Stories,</span><span>Our Streets.</span></h1>
+      <p class="tour-deck">Discover Austin’s African American history through the places, people, and legacies that shaped East Austin.</p>
+      <a class="btn btn--primary tour-hero__cta" href="#tour-route">Explore the tour <span aria-hidden="true">↓</span></a>
+    </div>
+  </section>
 
-      <div class="grid grid-2" style="margin-top:18px">
-        <div class="card"><div class="card__body">
-          <h2 class="h2">How it works</h2>
-          <ol class="p">
-            {data.overview.howItWorks.map((x) => (<li>{x}</li>))}
-          </ol>
-        </div></div>
-        <div class="card"><div class="card__body">
-          <h2 class="h2">What to expect</h2>
-          <ul class="p">
-            {data.overview.whatToExpect.map((x) => (<li>{x}</li>))}
-          </ul>
-        </div></div>
+  <section class="intro section">
+    <div class="container intro__grid">
+      <div>
+        <p class="section-label">History, in place</p>
+        <h2 class="display-heading">The street is the archive.</h2>
+      </div>
+      <div>
+        <p class="p intro__copy">{data.overview.body}</p>
+        <p class="route-stat"><strong>{data.stops.length}</strong><span>historic stops<br />across East Austin</span></p>
+      </div>
+    </div>
+  </section>
+
+  <TourMap guideId={guide.id} />
+
+  <section class="experience-preview section" aria-labelledby="experience-preview-title">
+    <div class="container experience-preview__grid">
+      <figure class="experience-preview__visual">
+        <div class="phone-frame">
+          <img src="/media/jacob/victory-grill-ar-preview.jpg" alt="Jacob Fontaine’s 3D character appearing inside the Victory Grill augmented reality experience" loading="lazy" />
+        </div>
+        <figcaption>Jacob Fontaine inside the Victory Grill AR experience.</figcaption>
+      </figure>
+      <div class="experience-preview__copy">
+        <p class="section-label">History appears where it happened</p>
+        <h2 class="display-heading" id="experience-preview-title">Step into the story.</h2>
+        <p class="p experience-preview__lead">Meet Jacob Fontaine at the places where East Austin history unfolded. Through augmented reality, your guide appears in the environment and brings each location’s story into view.</p>
+        <ol class="experience-cues" aria-label="How the augmented reality tour works">
+          <li><span>01</span><strong>Place Jacob</strong><small>Launch the experience at a tour stop.</small></li>
+          <li><span>02</span><strong>Listen to the story</strong><small>Hear history connected to the place around you.</small></li>
+          <li><span>03</span><strong>Continue the route</strong><small>Return to the tour and choose your next stop.</small></li>
+        </ol>
+        <a class="btn btn--primary" href="/tour/stop/victory-grill/?g=jacob-fontaine">Preview the Victory Grill stop <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section">
+    <div class="container">
+      <div class="guide-panel">
+        <div class="guide-panel__copy">
+          <p class="section-label">Meet your guide</p>
+          <h2 class="h2">Walk the route with {guide.name}</h2>
+          <p class="p">{guide.bio}</p>
+        </div>
+        <div class="guide-options" aria-label="Tour guide">
+          {data.guides.length > 1 ? data.guides.map((g) => (
+            <a class={`guide-choice ${g.id === guide.id ? 'is-active' : ''}`.trim()} href={`/tour/?g=${g.id}`} data-evt="guide_select" data-guide={g.id}>
+              {g.image?.src ? <img src={g.image.src} alt="" width="52" height="52" /> : <span class="guide-choice__monogram" aria-hidden="true">JF</span>}
+              <span><strong>{g.name}</strong><small>{g.tagline}</small></span>
+            </a>
+          )) : (
+            <div class="guide-choice is-active">
+              <span class="guide-choice__monogram" aria-hidden="true">JF</span>
+              <span><strong>{guide.name}</strong><small>{guide.tagline}</small></span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section route" id="tour-route">
+    <div class="container">
+      <div class="route__head">
+        <div><p class="section-label">Follow the route</p><h2 class="display-heading">Six places. Six stories.</h2></div>
+        <p class="p">Choose any stop, or begin at the Gold Dollar Building and follow the route in order.</p>
       </div>
 
-      <div class="grid grid-2" style="margin-top:18px">
-        {data.stops.map((s) => (
-          <article class="card">
-            {s.image?.src ? <img src={s.image.src} alt={s.name} style="width:100%;height:190px;object-fit:cover;display:block" loading="lazy" /> : null}
-            <div class="card__body">
-              <h2 class="h2" style="margin-bottom:6px">{s.name}</h2>
-              <p class="p small">{s.description}</p>
-              <p class="p small">{s.address}</p>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                <a class="btn btn--primary" href={`/tour/stop/${s.id}/`} data-evt="view_stop" data-stop={s.id}>View stop</a>
-                {s.mapUrl ? <a class="btn" href={s.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={s.id}>Map It</a> : null}
+      <div class="stop-grid">
+        {data.stops.map((s, index) => (
+          <article class={`stop-card stop-card--${s.id}`}>
+            <a class="stop-card__image" href={`/tour/stop/${s.id}/?g=${guide.id}`} data-evt="view_stop" data-stop={s.id}>
+              <img src={s.image.src} alt={s.name} loading="lazy" />
+              <span class="stop-card__number">{String(index + 1).padStart(2, '0')}</span>
+            </a>
+            <div class="stop-card__body">
+              <h3>{s.name}</h3>
+              <p>{s.description}</p>
+              <div class="stop-card__actions">
+                <a class="text-link" href={`/tour/stop/${s.id}/?g=${guide.id}`} data-evt="view_stop" data-stop={s.id}>View story <span aria-hidden="true">→</span></a>
+                {s.mapUrl ? <a class="map-link" href={s.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={s.id}>Map</a> : null}
               </div>
-              {s.image?.creditUrl ? <p class="small" style="margin-top:10px">Photo: <a href={s.image.creditUrl} target="_blank" rel="noreferrer">{s.image.creditName}</a></p> : null}
             </div>
           </article>
         ))}
       </div>
-
-      <p class="small" style="margin-top:18px">Note: This wrapper page helps standardize stops, analytics, and future AI interactions. The AR runtime is currently powered by 8th Wall. <a href="/tour/credits/">Photo credits</a>.</p>
     </div>
   </section>
 
-<script>
-  (() => {
-    const emit = (eventName, extra = {}) => {
-      const payload = { event: eventName, ...extra };
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', eventName, payload);
-      } else if (window.dataLayer && Array.isArray(window.dataLayer)) {
-        window.dataLayer.push(payload);
-      } else {
-        console.log('[WOW analytics]', payload);
-      }
-    };
+  <section class="how-section section">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <div class="how-grid">
+        {data.overview.howItWorks.map((item, index) => <div class="how-step"><span>{index + 1}</span><p>{item}</p></div>)}
+      </div>
+      <p class="credits-link"><a href="/tour/credits/">Photo credits and sources</a></p>
+    </div>
+  </section>
 
-    emit('tour_view');
-
-    document.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-evt]');
-      if (!el) return;
-      emit(el.getAttribute('data-evt'), { stop_id: el.getAttribute('data-stop') || '' });
-    });
-  })();
-</script>
-
+  <script>
+    (() => {
+      const emit = (eventName, extra = {}) => {
+        const payload = { event: eventName, ...extra };
+        if (typeof window.gtag === 'function') window.gtag('event', eventName, payload);
+        else if (window.dataLayer && Array.isArray(window.dataLayer)) window.dataLayer.push(payload);
+      };
+      emit('tour_view');
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const el = target.closest('[data-evt]');
+        if (!el) return;
+        emit(el.getAttribute('data-evt'), { stop_id: el.getAttribute('data-stop') || '' });
+      });
+    })();
+  </script>
 </BaseLayout>
