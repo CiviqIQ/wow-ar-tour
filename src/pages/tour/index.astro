@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
+import TourMap from '../../components/TourMap.astro';
 import data from '../../data/stops.json';
 
 const guideId = Astro.url.searchParams.get('g') || data.defaultGuideId;
@@ -35,6 +36,8 @@ const description = 'Discover Austin’s African American history through an imm
       </div>
     </div>
   </section>
+
+  <TourMap guideId={guide.id} />
 
   <section class="guide-section">
     <div class="container">
