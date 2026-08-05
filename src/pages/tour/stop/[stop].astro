@@ -70,9 +70,6 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
                 {stop.mapUrl ? <a class="btn" href={stop.mapUrl} target="_blank" rel="noreferrer" data-evt="map_click" data-stop={stop.id}>Map It</a> : null}
-                {stop.id === 'rosewood-courts' ? (
-                  <a class="btn" href="/tour/rosewood/quick-answers/" data-evt="rosewood_quick_answers" data-stop={stop.id}>Rosewood Quick Answers</a>
-                ) : null}
               </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
@@ -82,8 +79,6 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
               </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-                <button class="btn" type="button" data-copylink data-evt="copy_link" data-stop={stop.id}>Copy link</button>
-                <a class="btn" href={`/tour/stop/${stop.id}/${guideParam}`} target="_blank" rel="noreferrer" data-evt="share_open" data-stop={stop.id}>Open in new tab</a>
                 <button class="btn" type="button" data-reportissue data-evt="report_issue" data-stop={stop.id}>Report issue</button>
               </div>
 
@@ -124,21 +119,6 @@ const description = stop ? `Launch the AR story for ${stop.name}.` : 'Stop not f
     document.addEventListener('click', async (e) => {
       const a = e.target.closest('[data-evt]');
       if (!a) return;
-
-      // copy link helper
-      const copyBtn = e.target.closest('[data-copylink]');
-      if (copyBtn) {
-        try {
-          await navigator.clipboard.writeText(location.href);
-          emit('copy_link_success');
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => (copyBtn.textContent = 'Copy link'), 1200);
-        } catch {
-          emit('copy_link_failed');
-          window.prompt('Copy this link:', location.href);
-        }
-        return;
-      }
 
       // report issue helper
       const reportBtn = e.target.closest('[data-reportissue]');
